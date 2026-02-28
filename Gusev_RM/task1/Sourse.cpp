@@ -6,7 +6,6 @@ class temper {
 public:
 	temper(double celsi) {
 		temp = celsi;
-		
 	}
 	void smen(double celsi) {
 		temp = celsi;
