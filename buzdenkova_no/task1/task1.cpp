@@ -25,7 +25,6 @@ public:
 
     void read();
 
-
 };
 
 LongNumber LongNumber::add(const LongNumber& a, const LongNumber& b)
