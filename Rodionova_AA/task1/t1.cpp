@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 class Bits64 {
 private:
 
@@ -28,7 +29,7 @@ public:
         result.b = b + other.b;
 
         int c = 0;
-        if (result.b < b)
+        if (pow(2, 32)-1-b < other.b)
             c = 1;
         result.a = a + other.a + c;
         return result;
@@ -80,7 +81,7 @@ public:
 };
 void main()
 {
-    Bits64 rac1(3421153), rac2(31242576);
+    Bits64 rac1(999999), rac2(10001);
     Bits64 rac3 = rac1 + rac2;
 
     std::cout << rac3 << std::endl;
