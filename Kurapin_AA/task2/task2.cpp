@@ -146,6 +146,7 @@ int main() {
 	std::cout << "array: " << array.to_string() << " odd index array: " << array.OddIndex().to_string() << std::endl;
 
 	array.Size(5);
+	array[3] = 4;
 	std::cout << array.to_string() << std::endl;
 
 	getchar();
