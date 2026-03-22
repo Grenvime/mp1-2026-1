@@ -94,6 +94,6 @@ int main() {
     LongNumber divr = a.divr(b);
     std::cout << "Division with remainder: ";
     divr.print();
-
+    
     return 0;
 }
