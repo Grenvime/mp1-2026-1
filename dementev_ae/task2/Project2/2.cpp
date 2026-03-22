@@ -1,226 +1,170 @@
 #include <iostream>
 #include <cmath>
-#include <limits>
-#include <locale.h>
-using namespace std;
 
-class Polynomial {
+class Polinom {
 private:
-    static const int mdegree = 12;
-    int degree;
-    double coeff[mdegree + 1];
+    int stepen;
+    double koefficienty[13];
 
 public:
-    Polynomial() {
-        degree = 0;
-        for (int i = 0; i <= mdegree; i++) {
-            coeff[i] = 0;
+    Polinom() : stepen(0) {
+        for (int i = 0; i <= 12; ++i) {
+            koefficienty[i] = 0.0;
         }
     }
 
-    Polynomial(int deg) {
-        if (deg < 0 || deg > mdegree) {
-            cout << "Ошибка: степень должна быть от 0 до 12. Установлена степень 0.\n";
-            deg = 0;
-        }
-        degree = deg;
-        for (int i = 0; i <= mdegree; i++) {
-            coeff[i] = 0;
-        }
-    }
-
-    Polynomial(const Polynomial& other) {
-        degree = other.degree;
-        for (int i = 0; i <= mdegree; i++) {
-            coeff[i] = other.coeff[i];
-        }
-    }
-
-    void meny1(int deg) {
-        if (deg >= 0 && deg <= mdegree) {
-            degree = deg;
-            cout << "Степень установлена. Теперь введите коэффициенты.\n";
-            for (int i = 0; i <= degree; i++) {
-                cout << "Коэффициент при x^" << i << ": ";
-                cin >> coeff[i];
-            }
-            for (int i = degree + 1; i <= mdegree; i++) {
-                coeff[i] = 0;
-            }
+    explicit Polinom(int deg) : stepen(0) {
+        if (deg < 0 || deg > 12) {
+            std::cerr << "Ошибка: степень должна быть от 0 до 12" << std::endl;
         }
         else {
-            cout << "Ошибка: степень должна быть от 0 до 12\n";
+            stepen = deg;
+        }
+
+        for (int i = 0; i <= 12; ++i) {
+            koefficienty[i] = 0.0;
         }
     }
 
-    void meny2() {
-        cout << "Введите коэффициенты для степени " << degree << ":\n";
-        for (int i = 0; i <= degree; i++) {
-            cout << "Коэффициент при x^" << i << ": ";
-            cin >> coeff[i];
+    Polinom(const Polinom& other) : stepen(other.stepen) {
+        for (int i = 0; i <= 12; ++i) {
+            koefficienty[i] = other.koefficienty[i];
         }
     }
 
-    int meny3() {
-        return degree;
+    Polinom& operator=(const Polinom& other) {
+        if (this != &other) {
+            stepen = other.stepen;
+            for (int i = 0; i <= 12; ++i) {
+                koefficienty[i] = other.koefficienty[i];
+            }
+        }
+        return *this;
     }
 
-    void meny4() {
-        int n;
-        cout << "Введите номер коэффициента (0-" << mdegree << "): ";
-        cin >> n;
+    void setStepen(int deg) {
+        if (deg < 0 || deg > 12) {
+            std::cerr << "Ошибка: степень должна быть от 0 до 12" << std::endl;
+            return;
+        }
+        stepen = deg;
+    }
 
-        if (n >= 0 && n <= mdegree) {
-            if (n <= degree) {
-                cout << "Коэффициент при x^" << n << " = " << coeff[n] << endl;
+    void setKoefficient(int step, double znachenie) {
+        if (step < 0 || step > 12) {
+            std::cerr << "Ошибка: степень монома должна быть от 0 до 12" << std::endl;
+            return;
+        }
+        koefficienty[step] = znachenie;
+
+        if (step > stepen && znachenie != 0) {
+            stepen = step;
+        }
+        while (stepen > 0 && koefficienty[stepen] == 0) {
+            stepen--;
+        }
+    }
+
+    int getStepen() const {
+        return stepen;
+    }
+
+    double getKoefficient(int step) const {
+        if (step < 0 || step > 12) {
+            std::cerr << "Ошибка: степень вне допустимого диапазона" << std::endl;
+            return 0.0;
+        }
+        return koefficienty[step];
+    }
+
+    double vychislit(double x) const {
+        double rezultat = 0.0;
+        for (int i = 0; i <= stepen; ++i) {
+            rezultat += koefficienty[i] * std::pow(x, i);
+        }
+        return rezultat;
+    }
+
+    Polinom proizvodnaya() const {
+        if (stepen == 0) {
+            Polinom proizv(0);
+            proizv.setKoefficient(0, 0.0);
+            return proizv;
+        }
+
+        Polinom proizv(stepen - 1);
+        for (int i = 1; i <= stepen; ++i) {
+            proizv.setKoefficient(i - 1, koefficienty[i] * i);
+        }
+        return proizv;
+    }
+
+    void print() const {
+        bool pervyy = true;
+
+        for (int i = stepen; i >= 0; --i) {
+            if (koefficienty[i] == 0.0) continue;
+
+            double koef = koefficienty[i];
+
+            if (pervyy) {
+                if (koef < 0) std::cout << "-";
+                pervyy = false;
             }
             else {
-                cout << "Коэффициент при x^" << n << " = 0 (степень полинома " << degree << ")\n";
+                if (koef > 0) std::cout << " + ";
+                else std::cout << " - ";
             }
-        }
-        else {
-            cout << "Ошибка: неверный номер коэффициента\n";
-        }
-    }
 
-    void meny5() {
-        double x;
-        cout << "Введите значение x: ";
-        cin >> x;
+            double absKoef = std::abs(koef);
 
-        double result = 0;
-        double power = 1;
-
-        for (int i = 0; i <= degree; i++) {
-            result += coeff[i] * power;
-            power *= x;
-        }
-
-        cout << "P(" << x << ") = " << result << endl;
-    }
-
-    Polynomial meny6() {
-        Polynomial result;
-
-        if (degree > 0) {
-            result.degree = degree - 1;
-            for (int i = 1; i <= degree; i++) {
-                result.coeff[i - 1] = coeff[i] * i;
+            if (i == 0) {
+                std::cout << absKoef;
+            }
+            else if (i == 1) {
+                if (absKoef == 1.0) std::cout << "x";
+                else std::cout << absKoef << "x";
+            }
+            else {
+                if (absKoef == 1.0) std::cout << "x^" << i;
+                else std::cout << absKoef << "x^" << i;
             }
         }
 
-        return result;
-    }
-
-    void print() {
-        cout << "Полином: ";
-        bool first = true;
-        for (int i = degree; i >= 0; i--) {
-            if (coeff[i] != 0) {
-                if (!first && coeff[i] > 0) {
-                    cout << "+";
-                }
-                if (i == 0) {
-                    cout << coeff[i];
-                }
-                else if (i == 1) {
-                    cout << coeff[i] << "x";
-                }
-                else {
-                    cout << coeff[i] << "x^" << i;
-                }
-                first = false;
-            }
+        if (pervyy) {
+            std::cout << "0";
         }
-        if (first) {
-            cout << "0";
-        }
-        cout << endl;
+        std::cout << std::endl;
     }
 };
 
-void menu() {
-    cout << "1. Задать степень многочлена\n";
-    cout << "2. Задать коэффициенты мономов\n";
-    cout << "3. Узнать степень многочлена\n";
-    cout << "4. Узнать значение коэффициента по номеру\n";
-    cout << "5. Вычислить значение многочлена в точке x\n";
-    cout << "6. Найти производную многочлена\n";
-    cout << "7. Показать текущий полином\n";
-    cout << "0. Выход\n";
-    cout << "Выберите действие: ";
-}
-
 int main() {
-    setlocale(LC_ALL, "Russian");
-    Polynomial poly;
-    int choice;
-    bool running = true;
+    Polinom p(3);
 
-    while (running) {
-        menu();
-        cin >> choice;
+    p.setKoefficient(3, 2.0);
+    p.setKoefficient(2, 0.0);
+    p.setKoefficient(1, -3.0);
+    p.setKoefficient(0, 5.0);
 
-        switch (choice) {
-        case 1: {
-            cout << endl;
-            int deg;
-            cout << "Введите степень многочлена (0-12): ";
-            cin >> deg;
-            poly.meny1(deg);
-            cout << endl;
-            break;
-        }
+    std::cout << "Полином: ";
+    p.print();
 
-        case 2: {
-            cout << endl;
-            poly.meny2();
-            cout << endl;
-            break;
-        }
+    std::cout << "Степень: " << p.getStepen() << std::endl;
+    std::cout << "Коэффициент при x^2: " << p.getKoefficient(2) << std::endl;
+    std::cout << "Значение при x=2: " << p.vychislit(2) << std::endl;
 
-        case 3: {
-            cout << endl;
-            cout << "Степень многочлена: " << poly.meny3() << endl;
-            cout << endl;
-            break;
-        }
+    Polinom proizv = p.proizvodnaya();
+    std::cout << "Производная: ";
+    proizv.print();
 
-        case 4: {
-            cout << endl;
-            poly.meny4();
-            cout << endl;
-            break;
-        }
+    Polinom p2 = p;
+    std::cout << "Копия: ";
+    p2.print();
 
-        case 5: {
-            cout << endl;
-            poly.meny5();
-            cout << endl;
-            break;
-        }
+    Polinom p3;
+    p3 = p;
+    std::cout << "После присваивания: ";
+    p3.print();
 
-        case 6: {
-            cout << endl;
-            Polynomial deriv = poly.meny6();
-            cout << "Производная: ";
-            deriv.print();
-            cout << endl;
-            break;
-        }
-
-        case 7: {
-            cout << endl;
-            poly.print();
-            cout << endl;
-            break;
-        }
-
-        case 0: {
-            running = false;
-            break;
-        }
-        }
-    }
     return 0;
 }
