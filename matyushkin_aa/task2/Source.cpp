@@ -1,30 +1,49 @@
 #include <iostream>
 #include <string>
+#include <stdint.h>
+
 using namespace std;
 
-class Events {
-    struct { long long d; string n; } e[30];
-    int cnt = 0;
+struct date {
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
+};
 
-    static bool leap(int y) { return (y % 400 == 0) || (y % 4 == 0 && y % 100 != 0); }
-    static int dim(int m, int y) {
+struct event {
+    string title;
+    date date_;
+};
+
+class Calendar {
+    event events[30];
+    uint32_t count = 0;
+
+    bool leap(uint16_t year) {
+        return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0) || (year % 100 == 0 && year % 4 != 0);
+    }
+
+    int dim(int m, int y) {
         if (m == 2) return 28 + leap(y);
         return (m == 4 || m == 6 || m == 9 || m == 11) ? 30 : 31;
     }
-    static long long dayNum(int d, int m, int y) {
+
+    long long dayNum(int d, int m, int y) {
         long long r = 0;
         for (int i = 1; i < y; ++i) r += 365 + leap(i);
         for (int i = 1; i < m; ++i) r += dim(i, y);
         return r + d;
     }
-    static void fromNum(long long n, int& d, int& m, int& y) {
+
+    void fromNum(long long n, int& d, int& m, int& y) {
         y = 1;
         while (n > (365 + leap(y))) n -= 365 + leap(y), ++y;
         m = 1;
         while (n > dim(m, y)) n -= dim(m, y), ++m;
         d = n;
     }
-    static bool valid(int d, int m, int y) {
+
+    bool valid(int d, int m, int y) {
         return y > 0 && y < 2027 && m > 0 && m < 13 && d > 0 && d <= dim(m, y);
     }
 
@@ -64,15 +83,15 @@ public:
     }
 
     bool shift(int idx, int q, int mo, int da, string s) {
-        if (idx < 0 || idx >= cnt || cnt == 30) return false;
-        long long nd = e[idx].d + q * 90L + mo * 30L + da;
+        if (idx < 0 || idx >= count || count == 30) return false;
+        long long nd = events[idx].d + q * 90L + mo * 30L + da;
         if (nd < dayNum(1, 1, 1) || nd > dayNum(31, 12, 2026)) return false;
-        for (int i = 0; i < cnt; ++i) if (e[i].d == nd) return false;
+        for (int i = 0; i < count; ++i) if (events[i].d == nd) return false;
         e[cnt++] = { nd, s };
         return true;
     }
 
-    friend ostream& operator<<(ostream& os, const Events& ev) {
+    friend ostream& operator<<(ostream& os, const Calendar& ev) {
         for (int i = 0; i < ev.cnt; ++i) {
             int d, m, y;
             fromNum(ev.e[i].d, d, m, y);
@@ -84,7 +103,7 @@ public:
 
 int main() {
     setlocale(LC_ALL, "Ru");
-    Events cal;
+    Calendar cal;
     cal.set(1, 1, 2026, "Событие 1");
     cal.set(17, 3, 2026, "Событие 2");
     cout << cal;
