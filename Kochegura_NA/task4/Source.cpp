@@ -101,33 +101,25 @@ public:
 
         clearInputBuffer();
 
-        cout << "Enter song title: ";
         getline(cin, title);
 
         if (title.empty()) {
-            cout << "Title cannot be empty!" << endl;
             return;
         }
 
-        cout << "Enter author (lyrics author): ";
         getline(cin, author);
-
-        cout << "Enter composer (music author): ";
+;
         getline(cin, composer);
 
-        cout << "Enter performer: ";
         getline(cin, performer);
 
-        cout << "Enter album name (leave empty if none): ";
         getline(cin, album);
 
-        cout << "Enter release date (day month year separated by spaces): ";
         cin >> day >> month >> year;
 
         Date date = { day, month, year };
 
         if (!date.isValid()) {
-            cout << "Invalid date! Song not added." << endl;
             clearInputBuffer();
             return;
         }
@@ -136,7 +128,6 @@ public:
         songs.push_back(newSong);
         sortSongs();
 
-        cout << "Song successfully added!" << endl;
     }
 
     void editSong() {
@@ -144,46 +135,35 @@ public:
 
         clearInputBuffer();
 
-        cout << "Enter song title to edit: ";
         getline(cin, title);
-        cout << "Enter performer: ";
         getline(cin, performer);
 
         int index = findIndex(title, performer);
         if (index == -1) {
-            cout << "Song not found!" << endl;
             return;
         }
 
         Song& s = songs[index];
-        cout << "Current song data:" << endl;
         s.print();
 
-        cout << "Enter new data (leave empty to keep unchanged):" << endl;
 
         string input;
 
-        cout << "New title (" << s.title << "): ";
         getline(cin, input);
         if (!input.empty()) s.title = input;
 
-        cout << "New author (" << s.author << "): ";
         getline(cin, input);
         if (!input.empty()) s.author = input;
 
-        cout << "New composer (" << s.composer << "): ";
         getline(cin, input);
         if (!input.empty()) s.composer = input;
 
-        cout << "New performer (" << s.performer << "): ";
         getline(cin, input);
         if (!input.empty()) s.performer = input;
 
-        cout << "New album (" << s.album << "): ";
         getline(cin, input);
         if (!input.empty()) s.album = input;
 
-        cout << "Enter new date (day month year) or three zeros to skip: ";
         int d, m, y;
         cin >> d >> m >> y;
 
@@ -193,14 +173,12 @@ public:
                 s.releaseDate = newDate;
             }
             else {
-                cout << "Invalid date! Date not changed." << endl;
             }
         }
 
         clearInputBuffer();
 
         sortSongs();
-        cout << "Data updated!" << endl;
     }
 
     void findSong() const {
@@ -208,17 +186,13 @@ public:
 
         const_cast<Songbook*>(this)->clearInputBuffer();
 
-        cout << "Enter song title: ";
         getline(cin, title);
-        cout << "Enter performer: ";
         getline(cin, performer);
 
         int index = findIndex(title, performer);
         if (index == -1) {
-            cout << "Song not found!" << endl;
         }
         else {
-            cout << "Song found:" << endl;
             songs[index].print();
         }
     }
@@ -228,7 +202,6 @@ public:
 
         const_cast<Songbook*>(this)->clearInputBuffer();
 
-        cout << "Enter author name: ";
         getline(cin, author);
 
         bool found = false;
@@ -239,7 +212,6 @@ public:
             }
         }
         if (!found) {
-            cout << "No songs found by this author." << endl;
         }
     }
 
@@ -248,7 +220,6 @@ public:
 
         const_cast<Songbook*>(this)->clearInputBuffer();
 
-        cout << "Enter composer name: ";
         getline(cin, composer);
 
         bool found = false;
@@ -259,7 +230,6 @@ public:
             }
         }
         if (!found) {
-            cout << "No songs found by this composer." << endl;
         }
     }
 
@@ -268,7 +238,6 @@ public:
 
         const_cast<Songbook*>(this)->clearInputBuffer();
 
-        cout << "Enter performer name: ";
         getline(cin, performer);
 
         bool found = false;
@@ -279,7 +248,6 @@ public:
             }
         }
         if (!found) {
-            cout << "No songs found by this performer." << endl;
         }
     }
 
@@ -292,25 +260,20 @@ public:
 
         clearInputBuffer();
 
-        cout << "Enter song title to delete: ";
         getline(cin, title);
-        cout << "Enter performer: ";
         getline(cin, performer);
 
         int index = findIndex(title, performer);
         if (index == -1) {
-            cout << "Song not found!" << endl;
         }
         else {
             songs.erase(songs.begin() + index);
-            cout << "Song deleted!" << endl;
         }
     }
 
     bool saveToFile(const string& filename) const {
         ofstream out(filename);
         if (!out.is_open()) {
-            cout << "Error opening file for writing!" << endl;
             return false;
         }
 
@@ -325,14 +288,12 @@ public:
         }
 
         out.close();
-        cout << "Songbook saved to file " << filename << endl;
         return true;
     }
 
     bool loadFromFile(const string& filename) {
         ifstream in(filename);
         if (!in.is_open()) {
-            cout << "Error opening file for reading!" << endl;
             return false;
         }
 
@@ -341,7 +302,6 @@ public:
         in >> count;
 
         if (count < 0) {
-            cout << "Error: invalid file format!" << endl;
             in.close();
             return false;
         }
@@ -363,7 +323,6 @@ public:
 
             Date date = { day, month, year };
             if (!date.isValid()) {
-                cout << "Warning: invalid date in song \"" << title << "\". Song skipped." << endl;
                 continue;
             }
 
@@ -373,20 +332,16 @@ public:
 
         sortSongs();
         in.close();
-        cout << "Songbook loaded from file " << filename << ". Total songs: " << songs.size() << endl;
         return true;
     }
 
     void showAllSongs() const {
         if (songs.empty()) {
-            cout << "Songbook is empty." << endl;
             return;
         }
-        cout << "\n=== ALL SONGS (ordered by title) ===" << endl;
         for (const auto& song : songs) {
             song.print();
         }
-        cout << "Total songs: " << songs.size() << endl;
     }
 };
 
